@@ -22,7 +22,7 @@ type Tangel struct {
 	λ             int           // 交易的生成速率(达不到的话就用空交易)
 	h             time.Duration // 交易从生成到确认的时间间隔
 
-	tipExpireTime time.Duration // tip交易任期时长(这个时长会影响DAG分叉程度和TipSet的大小)
+	tipExpireTime time.Duration // tip交易任期时长(这个时长会影响DAG分叉程度和TipSet的大小) TODO:需要更加合理的设置这个参数
 
 	GenesisTx   *Transaction
 	TangleGraph *Transaction // 以Genesis为根节点的有向图结构

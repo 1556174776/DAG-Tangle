@@ -2,7 +2,6 @@ package tangle
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 	"tangle/common"
 	"tangle/database"
@@ -23,10 +22,12 @@ type Tangel struct {
 	λ             int           // 交易的生成速率(达不到的话就用空交易)
 	h             time.Duration // 交易从生成到确认的时间间隔
 
+	tipExpireTime time.Duration // tip交易任期时长(这个时长会影响DAG分叉程度和TipSet的大小)
+
 	GenesisTx   *Transaction
 	TangleGraph *Transaction // 以Genesis为根节点的有向图结构
 
-	TipSet        map[common.Hash]bool            // 存储当前的所有Tip(key值是交易哈希值)
+	TipSet        map[common.Hash]time.Time       // 存储当前的所有Tip(key值是交易哈希值,value记录交易成为tip的时间点)
 	CandidateTips map[common.Hash]*RawTransaction // 候选Tip交易
 
 	curTipMutex       sync.RWMutex
@@ -35,9 +36,10 @@ type Tangel struct {
 
 func NewTangle(λ int, h time.Duration, peer *p2p.Peer) *Tangel {
 	tangle := &Tangel{
-		peer: peer,
-		λ:    λ,
-		h:    h,
+		peer:          peer,
+		λ:             λ,
+		h:             h,
+		tipExpireTime: h,
 	}
 	if memDB1, err := leveldb.Open(storage.NewMemStorage(), nil); err != nil {
 		loglogrus.Log.Errorf("当前节点(%s:%d)无法创建内存数据库,err:%v\n", peer.LocalAddr.IP, peer.LocalAddr.Port, err)
@@ -58,8 +60,8 @@ func NewTangle(λ int, h time.Duration, peer *p2p.Peer) *Tangel {
 
 	tangle.GenesisTx = genesis
 	tangle.TangleGraph = genesis
-	tangle.TipSet = make(map[common.Hash]bool)
-	tangle.TipSet[genesis.RawTx.TxID] = true
+	tangle.TipSet = make(map[common.Hash]time.Time)
+	tangle.TipSet[genesis.RawTx.TxID] = time.Now()
 	tangle.CandidateTips = make(map[common.Hash]*RawTransaction)
 
 	return tangle
@@ -119,9 +121,29 @@ func (tg *Tangel) DealRcvTransaction(txs []*Transaction) {
 // 定期使用candidate更新tangle的tip集合(建立在一种特殊的tip策略上：一个新生成的区块只有经历固定的时间长度后才能成为tip)
 func (tg *Tangel) UpdateTipSet() {
 	cycle := time.NewTicker(tg.h / 2)
+	tipExpireCycle := time.NewTicker(tg.tipExpireTime)
 
 	for {
 		select {
+		case <-tipExpireCycle.C:
+			now := time.Now()
+			tg.curTipMutex.Lock()
+
+			for tip, _ := range tg.TipSet {
+				loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 更新前的(tipCount:%d) tip(%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+			}
+
+			for txID, eleTime := range tg.TipSet {
+				if now.Sub(eleTime) > tg.tipExpireTime {
+					delete(tg.TipSet, txID)
+				}
+			}
+			tg.curTipMutex.Unlock()
+
+			for tip, _ := range tg.TipSet {
+				loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 更新后的(tipCount:%d) tip(%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+			}
+
 		case <-cycle.C:
 			now := time.Now().UnixNano()
 			tg.curTipMutex.Lock()
@@ -131,33 +153,14 @@ func (tg *Tangel) UpdateTipSet() {
 
 					loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 的 candidate 交易(%x)可以进行上链,变为 Tip 交易, len(PreviousTxs) = %d\n",
 						tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, len(candidate.PreviousTxs))
-					prvTxs := candidate.PreviousTxs // 获取到此交易的前置交易集合
 
-					// TODO:交易从tip Set中的删除策略需要修改, 应该改成固定时限制,即交易成为tip后, 当了一段时间后就自动将其从tip集合中删除,不再能成为tip
-					for _, prvTx := range prvTxs { // 如果前置交易出现在 tangle.TipSet 中，则用当前交易将其替换掉
+					tg.DatabaseMutex.Lock()
+					key := candidate.TxID[:]
+					value := TransactionSerialize(candidate)
+					tg.Database.Put(key, value)
+					tg.DatabaseMutex.Unlock()
+					delete(tg.CandidateTips, candidate.TxID) // 将此上链的交易从候选tip集合中删除
 
-						for tip, _ := range tg.TipSet {
-							loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 更新前的(tipCount:%d) tip(%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
-						}
-
-						if !reflect.DeepEqual(prvTx, tg.GenesisTx.RawTx.TxID) { // 创世交易永远都可以作为tip
-							delete(tg.TipSet, prvTx)
-						}
-
-						tg.TipSet[candidate.TxID] = true
-						// candidate作为新的tip,可以上链了
-						tg.DatabaseMutex.Lock()
-						key := candidate.TxID[:]
-						value := TransactionSerialize(candidate)
-						tg.Database.Put(key, value)
-						tg.DatabaseMutex.Unlock()
-
-						for tip, _ := range tg.TipSet {
-							loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 更新后的(tipCount:%d) tip(%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
-						}
-
-						delete(tg.CandidateTips, candidate.TxID) // 将此上链的交易从候选tip集合中删除
-					}
 				}
 			}
 			tg.curTipMutex.Unlock()
@@ -169,32 +172,36 @@ func (tg *Tangel) UpdateTipSet() {
 
 // 发布一笔交易
 func (tg *Tangel) PublishTransaction(data interface{}) {
-	if len(tg.TipSet) == 1 && tg.TipSet[tg.GenesisTx.RawTx.TxID] { // 当前节点的tangle结构中只有一个创世交易
+	// if len(tg.TipSet) == 1 { // 当前节点的tangle结构中只有一个创世交易
 
-		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx只有一个 (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, tg.GenesisTx.RawTx.TxID)
+	// 	var tipTx common.Hash
+	// 	for tx, _ := range tg.TipSet {
+	// 		tipTx = tx
+	// 	}
+	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx只有一个 (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, tipTx)
 
-		newTx := NewTransaction(data, []common.Hash{tg.GenesisTx.RawTx.TxID}, tg.peer.BackNodeID())
-		tg.DatabaseMutex.Lock()
-		newTx.SelectApproveTx(tg.Database)
-		tg.DatabaseMutex.Unlock()
+	// 	newTx := NewTransaction(data, []common.Hash{tipTx}, tg.peer.BackNodeID())
+	// 	tg.DatabaseMutex.Lock()
+	// 	newTx.SelectApproveTx(tg.Database)
+	// 	tg.DatabaseMutex.Unlock()
 
-		for index, aTx := range newTx.RawTx.ApproveTx {
-			loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
-		}
+	// 	for index, aTx := range newTx.RawTx.ApproveTx {
+	// 		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
+	// 	}
 
-		newTx.Pow()
-		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
+	// 	newTx.Pow()
+	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
 
-		// 需要将该交易广播出去
-		wrapMsg := EncodeTxToWrapMsg(newTx, tg.peer.BackPrvKey())
-		tg.peer.Broadcast(wrapMsg)
+	// 	// 需要将该交易广播出去
+	// 	wrapMsg := EncodeTxToWrapMsg(newTx, tg.peer.BackPrvKey())
+	// 	tg.peer.Broadcast(wrapMsg)
 
-		tg.candidateTipMutex.Lock()
-		tg.CandidateTips[newTx.RawTx.TxID] = newTx.RawTx // 交易加入到候选tip集合
-		tg.candidateTipMutex.Unlock()
+	// 	tg.candidateTipMutex.Lock()
+	// 	tg.CandidateTips[newTx.RawTx.TxID] = newTx.RawTx // 交易加入到候选tip集合
+	// 	tg.candidateTipMutex.Unlock()
 
-		return
-	}
+	// 	return
+	// }
 
 	tg.curTipMutex.RLock()
 	tipSet := make([]common.Hash, 0)

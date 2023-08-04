@@ -21,6 +21,7 @@ const (
 	defaultDiff uint64 = 3 // 默认的Pow难度值
 )
 
+// TODO:会选出一样的交易，这个bug需要修改
 func RandomApproveStrategy(allTx []*RawTransaction) []*RawTransaction {
 	var count int
 	if len(allTx) < K {
@@ -91,7 +92,6 @@ func NewGenesisTx(sender common.NodeID) *Transaction {
 		Diff:        defaultDiff,
 		IsGenesis:   1,
 		Weight:      1,
-		TimeStamp:   uint64(time.Now().UnixNano()),
 	}
 	tx := &Transaction{
 		RawTx: rawTx,
@@ -199,7 +199,6 @@ func (tx *Transaction) Pow() {
 	for {
 		tx.RawTx.TxID = tx.Hash()
 		if strings.HasPrefix(fmt.Sprintf("%x", tx.RawTx.TxID), targetPrefix) {
-			loglogrus.Log.Infof("[Tangle] 发送方(%x) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tx.RawTx.Sender, tx.RawTx.TxID, tx.RawTx.Nonce)
 			return
 		}
 		tx.RawTx.Nonce++

@@ -2,6 +2,7 @@ package tangle
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 	"tangle/common"
 	"tangle/database"
@@ -95,8 +96,14 @@ func (tg *Tangel) DealRcvTransaction(txs []*Transaction) {
 	validTxs := make([]*Transaction, 0) // 存储所有有效的交易(能通过Pow验证)
 	for _, tx := range txs {
 		if tx.PowValidator() {
-			loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)(NodeID:%x)完成对来自Node(%x)交易(%x)的Pow验证\n", tg.peer.LocalAddr.IP,
-				tg.peer.LocalAddr.Port, tg.peer.BackNodeID(), tx.RawTx.Sender, tx.RawTx.TxID)
+
+			var approveTxStr string
+			for index, aTx := range tx.RawTx.ApproveTx {
+				approveTxStr += fmt.Sprintf("支持的第%d笔交易 (txID:%x)    ", index, aTx)
+			}
+			loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)(NodeID:%x)完成对来自Node(%x)交易(%x)的Pow验证, %s  \n", tg.peer.LocalAddr.IP,
+				tg.peer.LocalAddr.Port, tg.peer.BackNodeID(), tx.RawTx.Sender, tx.RawTx.TxID, approveTxStr)
+
 			validTxs = append(validTxs, tx)
 		}
 	}
@@ -126,10 +133,17 @@ func (tg *Tangel) UpdateTipSet() {
 						tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, len(candidate.PreviousTxs))
 					prvTxs := candidate.PreviousTxs // 获取到此交易的前置交易集合
 
+					// TODO:交易从tip Set中的删除策略需要修改, 应该改成固定时限制,即交易成为tip后, 当了一段时间后就自动将其从tip集合中删除,不再能成为tip
 					for _, prvTx := range prvTxs { // 如果前置交易出现在 tangle.TipSet 中，则用当前交易将其替换掉
-						if _, ok := tg.TipSet[prvTx]; ok {
+
+						for tip, _ := range tg.TipSet {
+							loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 更新前的(tipCount:%d) tip(%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+						}
+
+						if !reflect.DeepEqual(prvTx, tg.GenesisTx.RawTx.TxID) { // 创世交易永远都可以作为tip
 							delete(tg.TipSet, prvTx)
 						}
+
 						tg.TipSet[candidate.TxID] = true
 						// candidate作为新的tip,可以上链了
 						tg.DatabaseMutex.Lock()
@@ -137,7 +151,11 @@ func (tg *Tangel) UpdateTipSet() {
 						value := TransactionSerialize(candidate)
 						tg.Database.Put(key, value)
 						tg.DatabaseMutex.Unlock()
-						loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)成功更新tip\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port)
+
+						for tip, _ := range tg.TipSet {
+							loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 更新后的(tipCount:%d) tip(%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+						}
+
 						delete(tg.CandidateTips, candidate.TxID) // 将此上链的交易从候选tip集合中删除
 					}
 				}
@@ -153,11 +171,19 @@ func (tg *Tangel) UpdateTipSet() {
 func (tg *Tangel) PublishTransaction(data interface{}) {
 	if len(tg.TipSet) == 1 && tg.TipSet[tg.GenesisTx.RawTx.TxID] { // 当前节点的tangle结构中只有一个创世交易
 
+		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx只有一个 (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, tg.GenesisTx.RawTx.TxID)
+
 		newTx := NewTransaction(data, []common.Hash{tg.GenesisTx.RawTx.TxID}, tg.peer.BackNodeID())
 		tg.DatabaseMutex.Lock()
 		newTx.SelectApproveTx(tg.Database)
 		tg.DatabaseMutex.Unlock()
+
+		for index, aTx := range newTx.RawTx.ApproveTx {
+			loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
+		}
+
 		newTx.Pow()
+		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
 
 		// 需要将该交易广播出去
 		wrapMsg := EncodeTxToWrapMsg(newTx, tg.peer.BackPrvKey())
@@ -177,12 +203,22 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	}
 	tg.curTipMutex.RUnlock()
 
+	for tip, _ := range tg.TipSet {
+		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易得Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+	}
+
 	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID())
 
 	tg.DatabaseMutex.Lock()
 	newTx.SelectApproveTx(tg.Database)
 	tg.DatabaseMutex.Unlock()
+
+	for index, aTx := range newTx.RawTx.ApproveTx {
+		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
+	}
+
 	newTx.Pow()
+	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
 
 	// 需要将该交易广播出去
 	wrapMsg := EncodeTxToWrapMsg(newTx, tg.peer.BackPrvKey())

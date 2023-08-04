@@ -38,14 +38,15 @@ func TestTangle(t *testing.T) {
 	tangle2 := NewTangle(10, 4*time.Second, peer2)
 	tangle3 := NewTangle(10, 4*time.Second, peer3)
 
-	// go tangle1.ReadMsgFromP2PPool()
-	// go tangle2.ReadMsgFromP2PPool()
+	go tangle1.ReadMsgFromP2PPool()
+	go tangle2.ReadMsgFromP2PPool()
 	go tangle3.ReadMsgFromP2PPool()
 
-	// go tangle1.UpdateTipSet()
-	// go tangle2.UpdateTipSet()
+	go tangle1.UpdateTipSet()
+	go tangle2.UpdateTipSet()
 	go tangle3.UpdateTipSet()
 
+	// 测试一: 仅让tangle1(peer1)发布一笔交易
 	tangle1.PublishTransaction("tx1")
 	time.Sleep(10 * time.Second)
 
@@ -62,6 +63,7 @@ func TestTangle(t *testing.T) {
 
 	fmt.Println()
 
+	// 测试二: 让tangle1(peer1),tangle2(peer2)各自发布一笔交易
 	tangle1.PublishTransaction("tx2")
 	tangle2.PublishTransaction("tx2")
 	_ = tangle3
@@ -77,30 +79,20 @@ func TestTangle(t *testing.T) {
 		}
 	}
 
+	// // 测试三: 让tangle1(peer1),tangle2(peer2)各自再发布一笔交易
 	// tangle1.PublishTransaction("tx3")
 	// tangle2.PublishTransaction("tx3")
-	// tangle3.PublishTransaction("tx3")
-	// time.Sleep(5 * time.Second)
+	// _ = tangle3
+	// time.Sleep(10 * time.Second)
 
-	//for hash, msg := range peer2.MessagePool {
-	//	fmt.Printf("节点2消息池中消息 (hash:%x) (内容:%s)\n", hash, msg.BackPayload())
-	//
-	//	rawTx := new(RawTransaction)
-	//	if err := json.Unmarshal([]byte(msg.BackPayload().(string)), rawTx); err != nil {
-	//		loglogrus.Log.Warnf("[Tangle] 无法将Payload字节流解析为Transaction,err=%v\n", err)
-	//		continue
-	//	}
-	//	tx := &Transaction{RawTx: rawTx}
-	//	txSet := make([]*Transaction, 0)
-	//	txSet = append(txSet, tx)
-	//
-	//	tangle2.DealRcvTransaction(txSet)
-	//
-	//	msg.MarkRetrieved()
-	//}
-	//
-	//for hash, msg := range peer3.MessagePool {
-	//	fmt.Printf("节点3消息池中消息 (hash:%x) (内容:%s)\n", hash, msg.BackPayload())
-	//	msg.MarkRetrieved()
-	//}
+	// for tipID, _ := range tangle3.TipSet {
+	// 	fmt.Printf("--------------tip TxID : %x----------------\n", tipID)
+	// }
+
+	// for candidateID, candidate := range tangle3.CandidateTips {
+	// 	for _, approveTx := range candidate.ApproveTx {
+	// 		fmt.Printf("--------------------candidate TxID : %x  ,  approve TxID: %x----------------------\n", candidateID, approveTx)
+	// 	}
+	// }
+
 }

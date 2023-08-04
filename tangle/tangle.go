@@ -39,7 +39,7 @@ func NewTangle(λ int, h time.Duration, peer *p2p.Peer) *Tangel {
 		peer:          peer,
 		λ:             λ,
 		h:             h,
-		tipExpireTime: h,
+		tipExpireTime: 10 * time.Second,
 	}
 	if memDB1, err := leveldb.Open(storage.NewMemStorage(), nil); err != nil {
 		loglogrus.Log.Errorf("当前节点(%s:%d)无法创建内存数据库,err:%v\n", peer.LocalAddr.IP, peer.LocalAddr.Port, err)
@@ -153,6 +153,8 @@ func (tg *Tangel) UpdateTipSet() {
 
 					loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 的 candidate 交易(%x)可以进行上链,变为 Tip 交易, len(PreviousTxs) = %d\n",
 						tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, len(candidate.PreviousTxs))
+
+					tg.TipSet[candidate.TxID] = time.Now()
 
 					tg.DatabaseMutex.Lock()
 					key := candidate.TxID[:]

@@ -77,10 +77,12 @@ type RawTransaction struct {
 	ApproveTx        []common.Hash // 支持的Previous交易
 	IsGenesis        byte          // 是否是创世交易( == 1 表示是创世交易)
 	Height           uint64        // 到Genesis的最大长度
-	Depth            uint64        // 到tip的最大长度
 	CumulativeWeight uint64        // 累积权重(当前到tip)
-	Weight           uint64        // 自身权重，默认是1
 	Score            uint64        // 分数(当前到Genesis)
+
+	// Depth和Weight都是会变化的,因此不适合参与到TxID的计算中
+	Depth  uint64 // 到tip的最大长度
+	Weight uint64 // 自身权重，默认是1
 }
 
 // graph结构
@@ -175,6 +177,20 @@ func (tx *Transaction) SelectApproveTx(txDatabase database.Database) {
 	tx.RawTx.Height = maxHeight // 更新当前交易的height
 }
 
+func (tx *Transaction) BackPreviousAndTipTxs(tips []common.Hash) []common.Hash {
+	approvedTxs := tx.RawTx.ApproveTx
+
+	result := make([]common.Hash, 0)
+	for _, approvedTx := range approvedTxs {
+		for _, tip := range tips {
+			if reflect.DeepEqual(approvedTx, tip) {
+				result = append(result, approvedTx)
+			}
+		}
+	}
+	return result
+}
+
 // 更新一笔新Tx(新Tx是指刚刚完成上链的交易,也就是刚刚成为tip的交易)之前的所有Tx  (此更新任务可以异步进行)
 func (tx *Transaction) UpdatePreviousTx(txDatabase database.Database) {
 	if len(tx.RawTx.PreviousTxs) == 1 && reflect.DeepEqual(tx.RawTx.PreviousTxs[0], tx.RawTx.GenesisTx) { // 前方只有一笔创始交易(这种情况简单,只需要更新创世交易信息)
@@ -241,13 +257,33 @@ func (tx *Transaction) PowValidator() bool {
 
 // 求交易的哈希值
 func (tx *Transaction) Hash() common.Hash {
-	summary, err := rlp.EncodeToBytes(tx.RawTx)
+	target := tx.RawTx
+	target.Depth = 0
+	target.Weight = 0
+
+	summary, err := rlp.EncodeToBytes(target)
 	if err != nil {
 		loglogrus.Log.Warnf("[Tangle] 计算交易哈希值失败,err:%v\n", err)
 		return common.Hash{}
 	}
 	tx.RawTx.TxID = crypto.Sha3Hash(summary)
 	return tx.RawTx.TxID
+}
+
+// 简单的实现合约功能(写入操作)
+func (tx *Transaction) CommonExecuteWrite(worldState database.Database, key, value string) {
+	keyBytes := []byte(key)
+	valueBytes := []byte(value)
+
+	worldState.Put(keyBytes, valueBytes)
+}
+
+// 简单的实现合约功能(读取操作)
+func (tx *Transaction) CommonExecuteRead(worldState database.Database, key string) string {
+	keyBytes := []byte(key)
+	valueBytes, _ := worldState.Get(keyBytes)
+
+	return string(valueBytes)
 }
 
 func TransactionSerialize(rawTx *RawTransaction) []byte {

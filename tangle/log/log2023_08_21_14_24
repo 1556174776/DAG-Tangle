@@ -1,0 +1,154 @@
+[2023-08-21 14:24:05] [info] peer.go:113 tangle/p2p.(*Peer).LookUpOthers [P2P] 当前节点(127.0.0.1:8001)(NodeID:d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)与目标节点(127.0.0.1:8002)(NodeID:&36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)成功建立tcp连接
+
+[2023-08-21 14:24:05] [info] peer.go:113 tangle/p2p.(*Peer).LookUpOthers [P2P] 当前节点(127.0.0.1:8001)(NodeID:d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)与目标节点(127.0.0.1:8003)(NodeID:&e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)成功建立tcp连接
+
+[2023-08-21 14:24:05] [info] peer.go:113 tangle/p2p.(*Peer).LookUpOthers [P2P] 当前节点(127.0.0.1:8002)(NodeID:36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)与目标节点(127.0.0.1:8001)(NodeID:&d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)成功建立tcp连接
+
+[2023-08-21 14:24:05] [info] peer.go:113 tangle/p2p.(*Peer).LookUpOthers [P2P] 当前节点(127.0.0.1:8002)(NodeID:36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)与目标节点(127.0.0.1:8003)(NodeID:&e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)成功建立tcp连接
+
+[2023-08-21 14:24:05] [info] peer.go:113 tangle/p2p.(*Peer).LookUpOthers [P2P] 当前节点(127.0.0.1:8003)(NodeID:e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)与目标节点(127.0.0.1:8001)(NodeID:&d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)成功建立tcp连接
+
+[2023-08-21 14:24:05] [info] peer.go:113 tangle/p2p.(*Peer).LookUpOthers [P2P] 当前节点(127.0.0.1:8003)(NodeID:e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)与目标节点(127.0.0.1:8002)(NodeID:&36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)成功建立tcp连接
+
+[2023-08-21 14:24:06] [info] tangle.go:194 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001)即将发布的交易的Previous Tx(txCount:1) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:06] [info] transaction.go:156 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前 PreviousTxs 集合 -- (index:0) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:06] [info] transaction.go:163 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前tip集合 -- (index:0) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:06] [info] tangle.go:204 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001)即将发布交易支持的第(0)笔交易是 (TxID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:06] [info] tangle.go:208 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001) Pow计算得到的新交易的 TxID(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4) 此时的Nonce(6663)
+
+[2023-08-21 14:24:06] [info] peer.go:139 tangle/p2p.(*Peer).Broadcast [P2P] 当前节点(127.0.0.1:8001)向目标节点(127.0.0.1:8002)发送tcp报文段成功,长度(1038)
+
+[2023-08-21 14:24:06] [info] peer.go:215 tangle/p2p.(*Peer).Receive.func1 [P2P] 当前节点(127.0.0.1:8002)对对端(127.0.0.1:64133)消息的数字签名验证通过,此为合法消息
+
+[2023-08-21 14:24:06] [info] peer.go:215 tangle/p2p.(*Peer).Receive.func1 [P2P] 当前节点(127.0.0.1:8003)对对端(127.0.0.1:64134)消息的数字签名验证通过,此为合法消息
+
+[2023-08-21 14:24:06] [info] peer.go:139 tangle/p2p.(*Peer).Broadcast [P2P] 当前节点(127.0.0.1:8001)向目标节点(127.0.0.1:8003)发送tcp报文段成功,长度(1038)
+
+[2023-08-21 14:24:08] [info] tangle.go:110 tangle/tangle.(*Tangel).DealRcvTransaction [Tangle] 当前节点(127.0.0.1:8003)(NodeID:e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)完成对来自Node(d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)交易(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)的Pow验证, 支持的第0笔交易 (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)      
+
+[2023-08-21 14:24:08] [info] tangle.go:110 tangle/tangle.(*Tangel).DealRcvTransaction [Tangle] 当前节点(127.0.0.1:8002)(NodeID:36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)完成对来自Node(d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)交易(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)的Pow验证, 支持的第0笔交易 (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)      
+
+[2023-08-21 14:24:10] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 的 candidate 交易(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 1
+
+[2023-08-21 14:24:10] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 的 candidate 交易(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 1
+
+[2023-08-21 14:24:10] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 的 candidate 交易(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 1
+
+[2023-08-21 14:24:16] [info] tangle.go:194 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001)即将发布的交易的Previous Tx(txCount:2) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] tangle.go:194 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001)即将发布的交易的Previous Tx(txCount:2) (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] transaction.go:156 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前 PreviousTxs 集合 -- (index:0) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] transaction.go:156 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前 PreviousTxs 集合 -- (index:1) (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] transaction.go:163 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前tip集合 -- (index:0) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] transaction.go:163 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前tip集合 -- (index:1) (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] tangle.go:204 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001)即将发布交易支持的第(0)笔交易是 (TxID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] tangle.go:204 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001)即将发布交易支持的第(1)笔交易是 (TxID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] tangle.go:208 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8001) Pow计算得到的新交易的 TxID(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4) 此时的Nonce(5794)
+
+[2023-08-21 14:24:16] [info] peer.go:139 tangle/p2p.(*Peer).Broadcast [P2P] 当前节点(127.0.0.1:8001)向目标节点(127.0.0.1:8002)发送tcp报文段成功,长度(1276)
+
+[2023-08-21 14:24:16] [info] peer.go:215 tangle/p2p.(*Peer).Receive.func1 [P2P] 当前节点(127.0.0.1:8002)对对端(127.0.0.1:64133)消息的数字签名验证通过,此为合法消息
+
+[2023-08-21 14:24:16] [info] peer.go:139 tangle/p2p.(*Peer).Broadcast [P2P] 当前节点(127.0.0.1:8001)向目标节点(127.0.0.1:8003)发送tcp报文段成功,长度(1276)
+
+[2023-08-21 14:24:16] [info] peer.go:215 tangle/p2p.(*Peer).Receive.func1 [P2P] 当前节点(127.0.0.1:8003)对对端(127.0.0.1:64134)消息的数字签名验证通过,此为合法消息
+
+[2023-08-21 14:24:16] [info] tangle.go:194 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8002)即将发布的交易的Previous Tx(txCount:2) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] tangle.go:194 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8002)即将发布的交易的Previous Tx(txCount:2) (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] transaction.go:156 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前 PreviousTxs 集合 -- (index:0) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] transaction.go:156 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前 PreviousTxs 集合 -- (index:1) (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] transaction.go:163 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前tip集合 -- (index:0) (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] transaction.go:163 tangle/tangle.(*Transaction).SelectApproveTx [Tangle] 当前tip集合 -- (index:1) (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] tangle.go:204 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8002)即将发布交易支持的第(0)笔交易是 (TxID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:16] [info] tangle.go:204 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8002)即将发布交易支持的第(1)笔交易是 (TxID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:16] [info] tangle.go:208 tangle/tangle.(*Tangel).PublishTransaction [Tangle] 当前节点(127.0.0.1:8002) Pow计算得到的新交易的 TxID(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927) 此时的Nonce(6869)
+
+[2023-08-21 14:24:16] [info] peer.go:139 tangle/p2p.(*Peer).Broadcast [P2P] 当前节点(127.0.0.1:8002)向目标节点(127.0.0.1:8001)发送tcp报文段成功,长度(1278)
+
+[2023-08-21 14:24:16] [info] peer.go:215 tangle/p2p.(*Peer).Receive.func1 [P2P] 当前节点(127.0.0.1:8001)对对端(127.0.0.1:64135)消息的数字签名验证通过,此为合法消息
+
+[2023-08-21 14:24:16] [info] peer.go:215 tangle/p2p.(*Peer).Receive.func1 [P2P] 当前节点(127.0.0.1:8003)对对端(127.0.0.1:64136)消息的数字签名验证通过,此为合法消息
+
+[2023-08-21 14:24:16] [info] peer.go:139 tangle/p2p.(*Peer).Broadcast [P2P] 当前节点(127.0.0.1:8002)向目标节点(127.0.0.1:8003)发送tcp报文段成功,长度(1278)
+
+[2023-08-21 14:24:18] [info] tangle.go:110 tangle/tangle.(*Tangel).DealRcvTransaction [Tangle] 当前节点(127.0.0.1:8001)(NodeID:d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)完成对来自Node(36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)交易(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)的Pow验证, 支持的第0笔交易 (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)    支持的第1笔交易 (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)      
+
+[2023-08-21 14:24:18] [info] tangle.go:110 tangle/tangle.(*Tangel).DealRcvTransaction [Tangle] 当前节点(127.0.0.1:8003)(NodeID:e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)完成对来自Node(d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)交易(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)的Pow验证, 支持的第0笔交易 (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)    支持的第1笔交易 (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)      
+
+[2023-08-21 14:24:18] [info] tangle.go:110 tangle/tangle.(*Tangel).DealRcvTransaction [Tangle] 当前节点(127.0.0.1:8003)(NodeID:e0ae66ae6799a4699d656c51246cff218474c93a5c3f8373aa3c3aa8d41497ceada17a73ffb77e6b1d8683980ed4ed95eccc7373ef4169328832fe3b0e787003)完成对来自Node(36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)交易(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)的Pow验证, 支持的第0笔交易 (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)    支持的第1笔交易 (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)      
+
+[2023-08-21 14:24:18] [info] tangle.go:110 tangle/tangle.(*Tangel).DealRcvTransaction [Tangle] 当前节点(127.0.0.1:8002)(NodeID:36b36ede5727a00b80f27696ba9f4839691bb6402680a6e2e69c7445da996ab71e09f64b028bde921855629a81308d1b876085d3bd42df228367b1d1c98e6f75)完成对来自Node(d27e9eb30b4d883412ee9c1f554296024fe3ecbbe466a9074be0994c47b7d8b8e649c76539dbd39be2b05a9bcae1d7f10d09f698585d77b7dd29d0252ed8d93d)交易(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)的Pow验证, 支持的第0笔交易 (txID:884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)    支持的第1笔交易 (txID:0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)      
+
+[2023-08-21 14:24:22] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 的 candidate 交易(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 2
+
+[2023-08-21 14:24:22] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 的 candidate 交易(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 2
+
+[2023-08-21 14:24:22] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 的 candidate 交易(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 2
+
+[2023-08-21 14:24:22] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 的 candidate 交易(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 2
+
+[2023-08-21 14:24:22] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 的 candidate 交易(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 2
+
+[2023-08-21 14:24:22] [info] tangle.go:158 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 的 candidate 交易(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)可以进行上链,变为 Tip 交易, len(PreviousTxs) = 2
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新前的(tipCount:4) tip(884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新前的(tipCount:4) tip(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新前的(tipCount:4) tip(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新前的(tipCount:4) tip(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新前的(tipCount:4) tip(884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新前的(tipCount:4) tip(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新前的(tipCount:4) tip(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新前的(tipCount:4) tip(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新后的(tipCount:3) tip(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新后的(tipCount:3) tip(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8001) 更新后的(tipCount:3) tip(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新后的(tipCount:3) tip(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新前的(tipCount:4) tip(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新前的(tipCount:4) tip(884638e4127c3956e29770dcadb6fbd8ac7149e9204ae51d03fa3043021b84e2)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新前的(tipCount:4) tip(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:26] [info] tangle.go:137 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新前的(tipCount:4) tip(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新后的(tipCount:3) tip(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8002) 更新后的(tipCount:3) tip(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新后的(tipCount:3) tip(0004e8d2f2ad931c388f64ced26ace0dc6c2b5b46d12f0d3d2f56682452564d4)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新后的(tipCount:3) tip(00051b6af0e985f8cfd714c990ec7e63cea0cfe7e006cbccac19ef9b2827bce4)
+
+[2023-08-21 14:24:26] [info] tangle.go:148 tangle/tangle.(*Tangel).UpdateTipSet [Tangle] 当前节点(127.0.0.1:8003) 更新后的(tipCount:3) tip(0009fdf5418853713e87e9f8eefea537c78d7146f7f665d1293ef1988f861927)
+

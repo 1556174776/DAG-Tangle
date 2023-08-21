@@ -20,11 +20,15 @@ const (
 
 type Tangel struct {
 	peer          *p2p.Peer
-	Database      database.Database
+	Database      database.Database // 专门存储区块的数据库
 	DatabaseMutex sync.RWMutex
-	L0            int           // tip节点的数量
-	λ             int           // 交易的生成速率(达不到的话就用空交易)
-	h             time.Duration // 交易从生成到确认的时间间隔
+
+	WorldState      database.Database // 存储世界状态的数据库
+	WorldStateMutex sync.RWMutex
+
+	L0 int           // tip节点的数量
+	λ  int           // 交易的生成速率(达不到的话就用空交易)
+	h  time.Duration // 交易从生成到确认的时间间隔
 
 	tipExpireTime time.Duration // tip交易任期时长(这个时长会影响DAG分叉程度和TipSet的大小) TODO:需要更加合理的设置这个参数
 
@@ -49,7 +53,14 @@ func NewTangle(λ int, h time.Duration, peer *p2p.Peer) *Tangel {
 		loglogrus.Log.Errorf("当前节点(%s:%d)无法创建内存数据库,err:%v\n", peer.LocalAddr.IP, peer.LocalAddr.Port, err)
 		return nil
 	} else {
-		tangle.Database = database.NewSimpleLDB("transaction", memDB1)
+		tangle.Database = database.NewSimpleLDB("Transaction", memDB1)
+	}
+
+	if memDB2, err := leveldb.Open(storage.NewMemStorage(), nil); err != nil {
+		loglogrus.Log.Errorf("当前节点(%s:%d)无法创建内存数据库,err:%v\n", peer.LocalAddr.IP, peer.LocalAddr.Port, err)
+		return nil
+	} else {
+		tangle.WorldState = database.NewSimpleLDB("WorldState", memDB2)
 	}
 
 	// 将创始交易存入数据库
@@ -167,6 +178,22 @@ func (tg *Tangel) UpdateTipSet() {
 					tg.DatabaseMutex.Unlock()
 					delete(tg.CandidateTips, candidate.TxID) // 将此上链的交易从候选tip集合中删除
 
+					// 更新当前交易的approveTx的相关信息(其实只需要更新其中的tip部分即可)
+					candidateTx := &Transaction{RawTx: candidate}
+					tg.DatabaseMutex.Lock()
+					candidateTx.UpdatePreviousTx(tg.Database)
+					tg.DatabaseMutex.Unlock()
+
+					// 执行 candidateTx 交易
+					tg.WorldStateMutex.Lock()
+					candidateTx.CommonExecuteWrite(tg.WorldState, "test-key", "test-value")
+
+					res := candidateTx.CommonExecuteRead(tg.WorldState, "test-key")
+
+					loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 的 candidate(%x) 交易执行结果为: %s",
+						tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, res)
+
+					tg.WorldStateMutex.Unlock()
 				}
 			}
 			tg.curTipMutex.Unlock()

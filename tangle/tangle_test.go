@@ -49,7 +49,7 @@ func TestTangle(t *testing.T) {
 	// 测试一: 仅让tangle1(peer1)发布一笔交易
 	go func() {
 		for i := 0; i < 9; i++ {
-			tangle1.PublishTransaction(fmt.Sprintf("tx%d", i))
+			tangle1.PublishTransaction(fmt.Sprintf("tx%d", i), CommonWriteAndReadCode)
 		}
 	}()
 
@@ -70,8 +70,8 @@ func TestTangle(t *testing.T) {
 	fmt.Println()
 
 	// 测试二: 让tangle1(peer1),tangle2(peer2)各自发布一笔交易
-	tangle1.PublishTransaction("tx2")
-	tangle2.PublishTransaction("tx2")
+	tangle1.PublishTransaction("tx2", CommonWriteAndReadCode)
+	tangle2.PublishTransaction("tx2", CommonWriteAndReadCode)
 	_ = tangle3
 	time.Sleep(15 * time.Second)
 
@@ -88,8 +88,8 @@ func TestTangle(t *testing.T) {
 	time.Sleep(10 * time.Second)
 
 	// 测试三: 让tangle1(peer1),tangle2(peer2)各自再发布一笔交易
-	tangle1.PublishTransaction("tx3")
-	tangle2.PublishTransaction("tx3")
+	tangle1.PublishTransaction("tx3", CommonWriteAndReadCode)
+	tangle2.PublishTransaction("tx3", CommonWriteAndReadCode)
 	_ = tangle3
 	time.Sleep(10 * time.Second)
 

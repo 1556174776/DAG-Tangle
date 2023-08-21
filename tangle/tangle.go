@@ -231,7 +231,7 @@ func (tg *Tangel) BackTxCount() int {
 }
 
 // 发布一笔交易
-func (tg *Tangel) PublishTransaction(data interface{}) {
+func (tg *Tangel) PublishTransaction(data interface{}, txCode int) {
 	tg.curTipMutex.RLock()
 	tipSet := make([]common.Hash, 0)
 	for tip, _ := range tg.TipSet {
@@ -243,7 +243,7 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
 	// }
 
-	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID(), CommonWriteAndReadCode)
+	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID(), txCode)
 
 	tg.DatabaseMutex.Lock()
 	newTx.SelectApproveTx(tg.Database)

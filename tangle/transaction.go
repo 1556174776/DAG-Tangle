@@ -25,6 +25,8 @@ const (
 	CommonWriteCode        = 0x00 // 表示交易类型,依据此来执行不同的合约函数
 	CommonReadCode         = 0x01
 	CommonWriteAndReadCode = 0x02
+
+	// TODO: BGP相关交易类型
 )
 
 // TODO:会选出一样的交易，这个bug需要修改

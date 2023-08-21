@@ -18,7 +18,7 @@ import (
 const (
 	defaultMsgExpireTime = 4 * time.Second
 	nodeIDBuff           = 128
-	msgBuff              = 2048
+	msgBuff              = 2048 * 10
 )
 
 type Address struct {
@@ -136,8 +136,8 @@ func (peer *Peer) Broadcast(wrapMsg *message.WrapMessage) {
 			loglogrus.Log.Warnf("[P2P] 当前节点(%s:%d)向目标节点(%s:%d)发送tcp报文段失败,err:%v\n", peer.LocalAddr.IP, peer.LocalAddr.Port,
 				remote.RemoteAddr.IP, remote.RemoteAddr.Port, err)
 		} else {
-			loglogrus.Log.Infof("[P2P] 当前节点(%s:%d)向目标节点(%s:%d)发送tcp报文段成功,长度(%d)\n", peer.LocalAddr.IP, peer.LocalAddr.Port,
-				remote.RemoteAddr.IP, remote.RemoteAddr.Port, len(msgBytes))
+			// loglogrus.Log.Infof("[P2P] 当前节点(%s:%d)向目标节点(%s:%d)发送tcp报文段成功,长度(%d)\n", peer.LocalAddr.IP, peer.LocalAddr.Port,
+			// 	remote.RemoteAddr.IP, remote.RemoteAddr.Port, len(msgBytes))
 		}
 	}
 }

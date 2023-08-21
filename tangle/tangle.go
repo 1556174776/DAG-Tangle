@@ -160,6 +160,11 @@ func (tg *Tangel) UpdateTipSet() {
 			}
 
 		case <-cycle.C:
+
+			if len(tg.TipSet) >= tg.L0 { // tip节点的数量不能超过L0
+				continue
+			}
+
 			now := time.Now().UnixNano()
 			tg.curTipMutex.Lock()
 			tg.candidateTipMutex.Lock()
@@ -212,9 +217,9 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	}
 	tg.curTipMutex.RUnlock()
 
-	for tip, _ := range tg.TipSet {
-		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
-	}
+	// for tip, _ := range tg.TipSet {
+	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+	// }
 
 	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID())
 
@@ -222,9 +227,9 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	newTx.SelectApproveTx(tg.Database)
 	tg.DatabaseMutex.Unlock()
 
-	for index, aTx := range newTx.RawTx.ApproveTx {
-		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
-	}
+	// for index, aTx := range newTx.RawTx.ApproveTx {
+	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
+	// }
 
 	newTx.Pow()
 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的新交易的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)

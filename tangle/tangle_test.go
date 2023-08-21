@@ -47,7 +47,13 @@ func TestTangle(t *testing.T) {
 	go tangle3.UpdateTipSet()
 
 	// 测试一: 仅让tangle1(peer1)发布一笔交易
-	tangle1.PublishTransaction("tx1")
+	go func() {
+		for i := 0; i < 9; i++ {
+			tangle1.PublishTransaction(fmt.Sprintf("tx%d", i))
+		}
+	}()
+
+	// tangle1.PublishTransaction("tx1")
 	time.Sleep(10 * time.Second)
 
 	for tipID, _ := range tangle3.TipSet {
@@ -67,7 +73,7 @@ func TestTangle(t *testing.T) {
 	tangle1.PublishTransaction("tx2")
 	tangle2.PublishTransaction("tx2")
 	_ = tangle3
-	time.Sleep(10 * time.Second)
+	time.Sleep(15 * time.Second)
 
 	for tipID, _ := range tangle3.TipSet {
 		fmt.Printf("--------------tip TxID : %x----------------\n", tipID)
@@ -79,20 +85,22 @@ func TestTangle(t *testing.T) {
 		}
 	}
 
-	// // 测试三: 让tangle1(peer1),tangle2(peer2)各自再发布一笔交易
-	// tangle1.PublishTransaction("tx3")
-	// tangle2.PublishTransaction("tx3")
-	// _ = tangle3
-	// time.Sleep(10 * time.Second)
+	time.Sleep(10 * time.Second)
 
-	// for tipID, _ := range tangle3.TipSet {
-	// 	fmt.Printf("--------------tip TxID : %x----------------\n", tipID)
-	// }
+	// 测试三: 让tangle1(peer1),tangle2(peer2)各自再发布一笔交易
+	tangle1.PublishTransaction("tx3")
+	tangle2.PublishTransaction("tx3")
+	_ = tangle3
+	time.Sleep(10 * time.Second)
 
-	// for candidateID, candidate := range tangle3.CandidateTips {
-	// 	for _, approveTx := range candidate.ApproveTx {
-	// 		fmt.Printf("--------------------candidate TxID : %x  ,  approve TxID: %x----------------------\n", candidateID, approveTx)
-	// 	}
-	// }
+	for tipID, _ := range tangle3.TipSet {
+		fmt.Printf("--------------tip TxID : %x----------------\n", tipID)
+	}
+
+	for candidateID, candidate := range tangle3.CandidateTips {
+		for _, approveTx := range candidate.ApproveTx {
+			fmt.Printf("--------------------candidate TxID : %x  ,  approve TxID: %x----------------------\n", candidateID, approveTx)
+		}
+	}
 
 }

@@ -149,20 +149,20 @@ func (tx *Transaction) SelectApproveTx(txDatabase database.Database) {
 
 	// 从数据库中查询当前交易的所有 PreviousTx
 	previousRawTxs := make([]*RawTransaction, 0)
-	for index, preTx := range tx.RawTx.PreviousTxs {
+	for _, preTx := range tx.RawTx.PreviousTxs {
 		key := preTx[:]
 		txBytes, _ := txDatabase.Get(key)
 		txEntity := TransactionDeSerialize(txBytes)
 		previousRawTxs = append(previousRawTxs, txEntity)
 
-		loglogrus.Log.Infof("[Tangle] 当前 PreviousTxs 集合 -- (index:%d) (txID:%x)\n", index, preTx)
+		//loglogrus.Log.Infof("[Tangle] 当前 PreviousTxs 集合 -- (index:%d) (txID:%x)\n", index, preTx)
 	}
 
 	approveTxs := tx.ApproveStrategy(previousRawTxs) // 从所有的tip交易(tip交易必定是已经上链的,也就是一定是已经存储在数据库中的)中选出K个交易进行approve
 
-	for index, approveTx := range approveTxs {
+	for _, approveTx := range approveTxs {
 		tx.RawTx.ApproveTx = append(tx.RawTx.ApproveTx, approveTx.TxID)
-		loglogrus.Log.Infof("[Tangle] 当前tip集合 -- (index:%d) (txID:%x)\n", index, approveTx.TxID)
+		//loglogrus.Log.Infof("[Tangle] 当前tip集合 -- (index:%d) (txID:%x)\n", index, approveTx.TxID)
 	}
 
 	// 更改被选中为 approveTx 的 PreviousTx 的状态 和 当前交易的状态

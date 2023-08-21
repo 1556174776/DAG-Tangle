@@ -14,6 +14,10 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/storage"
 )
 
+const (
+	TipExpireTime = 20 * time.Second
+)
+
 type Tangel struct {
 	peer          *p2p.Peer
 	Database      database.Database
@@ -39,7 +43,7 @@ func NewTangle(λ int, h time.Duration, peer *p2p.Peer) *Tangel {
 		peer:          peer,
 		λ:             λ,
 		h:             h,
-		tipExpireTime: 10 * time.Second,
+		tipExpireTime: TipExpireTime,
 	}
 	if memDB1, err := leveldb.Open(storage.NewMemStorage(), nil); err != nil {
 		loglogrus.Log.Errorf("当前节点(%s:%d)无法创建内存数据库,err:%v\n", peer.LocalAddr.IP, peer.LocalAddr.Port, err)
@@ -73,7 +77,7 @@ func (tg *Tangel) ReadMsgFromP2PPool() {
 		select {
 		case <-cycle.C:
 			allMsg := tg.peer.BackAllMsg()
-			fmt.Printf("[Tangle] 当前节点(%s:%d)p2p消息池中的消息数量: %d\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(allMsg))
+			//fmt.Printf("[Tangle] 当前节点(%s:%d)p2p消息池中的消息数量: %d\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(allMsg))
 
 			txSet := make([]*Transaction, 0)
 			for _, msg := range allMsg {
@@ -174,37 +178,6 @@ func (tg *Tangel) UpdateTipSet() {
 
 // 发布一笔交易
 func (tg *Tangel) PublishTransaction(data interface{}) {
-	// if len(tg.TipSet) == 1 { // 当前节点的tangle结构中只有一个创世交易
-
-	// 	var tipTx common.Hash
-	// 	for tx, _ := range tg.TipSet {
-	// 		tipTx = tx
-	// 	}
-	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx只有一个 (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, tipTx)
-
-	// 	newTx := NewTransaction(data, []common.Hash{tipTx}, tg.peer.BackNodeID())
-	// 	tg.DatabaseMutex.Lock()
-	// 	newTx.SelectApproveTx(tg.Database)
-	// 	tg.DatabaseMutex.Unlock()
-
-	// 	for index, aTx := range newTx.RawTx.ApproveTx {
-	// 		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布交易支持的第(%d)笔交易是 (TxID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, index, aTx)
-	// 	}
-
-	// 	newTx.Pow()
-	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
-
-	// 	// 需要将该交易广播出去
-	// 	wrapMsg := EncodeTxToWrapMsg(newTx, tg.peer.BackPrvKey())
-	// 	tg.peer.Broadcast(wrapMsg)
-
-	// 	tg.candidateTipMutex.Lock()
-	// 	tg.CandidateTips[newTx.RawTx.TxID] = newTx.RawTx // 交易加入到候选tip集合
-	// 	tg.candidateTipMutex.Unlock()
-
-	// 	return
-	// }
-
 	tg.curTipMutex.RLock()
 	tipSet := make([]common.Hash, 0)
 	for tip, _ := range tg.TipSet {
@@ -213,7 +186,7 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	tg.curTipMutex.RUnlock()
 
 	for tip, _ := range tg.TipSet {
-		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易得Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
+		loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
 	}
 
 	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID())
@@ -227,7 +200,7 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	}
 
 	newTx.Pow()
-	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
+	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) Pow计算得到的新交易的 TxID(%x) 此时的Nonce(%d)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, newTx.RawTx.TxID, newTx.RawTx.Nonce)
 
 	// 需要将该交易广播出去
 	wrapMsg := EncodeTxToWrapMsg(newTx, tg.peer.BackPrvKey())

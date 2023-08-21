@@ -34,19 +34,27 @@ func RandomApproveStrategy(allTx []*RawTransaction) []*RawTransaction {
 	indexSet := make([]int, count)
 
 	for i := 0; i < count; i++ {
-		rand.Seed(time.Now().UnixNano())
-		time.Sleep(time.Nanosecond)
-		index := rand.Intn(count)
-		dup := false
-		for j := 0; j < i; j++ {
-			if indexSet[j] == index {
-				dup = true
+		for {
+			dup := false
+			rand.Seed(time.Now().UnixNano())
+			time.Sleep(time.Nanosecond)
+			index := rand.Intn(count)
+
+			for j := 0; j < i; j++ {
+				if indexSet[j] == index {
+					dup = true
+					break
+				}
+			}
+
+			if dup {
+				continue
+			} else {
+				indexSet[i] = index
 				break
 			}
 		}
-		if !dup {
-			indexSet[i] = index
-		}
+
 	}
 
 	for i := 0; i < count; i++ {
@@ -68,7 +76,6 @@ type RawTransaction struct {
 	TimeStamp        uint64        // 交易产生的时间戳
 	ApproveTx        []common.Hash // 支持的Previous交易
 	IsGenesis        byte          // 是否是创世交易( == 1 表示是创世交易)
-	IsTip            byte          // 是否是tip( == 1 表示是tip交易)
 	Height           uint64        // 到Genesis的最大长度
 	Depth            uint64        // 到tip的最大长度
 	CumulativeWeight uint64        // 累积权重(当前到tip)
@@ -107,7 +114,6 @@ func NewTransaction(data interface{}, tipTx []common.Hash, sender common.NodeID)
 		PreviousTxs: tipTx,
 		Sender:      sender,
 		Diff:        defaultDiff,
-		IsTip:       1,
 		IsGenesis:   0,
 		Weight:      1,
 		TimeStamp:   uint64(time.Now().UnixNano()),
@@ -130,20 +136,7 @@ func (tx *Transaction) SelectApproveTx(txDatabase database.Database) {
 	if len(tx.RawTx.PreviousTxs) == 1 && reflect.DeepEqual(tx.RawTx.PreviousTxs[0], tx.RawTx.GenesisTx) { // 前面只有一个创世交易
 		genesisHash := tx.RawTx.PreviousTxs[0]
 
-		// 在数据库中查询到创世交易
-		key := genesisHash[:]
-		txBytes, _ := txDatabase.Get(key)
-		genesisTx := TransactionDeSerialize(txBytes)
-
-		// 更新创世交易的权重和深度
-		genesisTx.Weight += tx.RawTx.Weight
-		genesisTx.Depth += 1
-
-		// 重新存入数据库
-		value := TransactionSerialize(genesisTx)
-		txDatabase.Put(key, value)
-
-		tx.RawTx.ApproveTx = append(tx.RawTx.ApproveTx, genesisTx.TxID) // 只能支持创世交易
+		tx.RawTx.ApproveTx = append(tx.RawTx.ApproveTx, genesisHash) // 只能支持创世交易
 		tx.RawTx.Height += 1
 		tx.RawTx.Score += 1
 
@@ -173,24 +166,53 @@ func (tx *Transaction) SelectApproveTx(txDatabase database.Database) {
 	// 更改被选中为 approveTx 的 PreviousTx 的状态 和 当前交易的状态
 	maxHeight := uint64(0)
 	for _, approveTx := range approveTxs {
-		approveTx.IsTip = 0                 // 被支持的交易不再是tip
-		approveTx.Weight += tx.RawTx.Weight // 被支持的交易权重 要增加
-
-		approveTx.Depth += 1 // 被支持交易的深度+1
-
 		tx.RawTx.Score += approveTx.Score // 当前交易的score要增加，加上所支持交易的score
-
 		if approveTx.Height > maxHeight {
 			maxHeight = approveTx.Height
 		}
-
-		key := approveTx.TxID[:]
-		value := TransactionSerialize(approveTx)
-		txDatabase.Put(key, value)
-
 	}
 
 	tx.RawTx.Height = maxHeight // 更新当前交易的height
+}
+
+// 更新一笔新Tx(新Tx是指刚刚完成上链的交易,也就是刚刚成为tip的交易)之前的所有Tx  (此更新任务可以异步进行)
+func (tx *Transaction) UpdatePreviousTx(txDatabase database.Database) {
+	if len(tx.RawTx.PreviousTxs) == 1 && reflect.DeepEqual(tx.RawTx.PreviousTxs[0], tx.RawTx.GenesisTx) { // 前方只有一笔创始交易(这种情况简单,只需要更新创世交易信息)
+		genesisHash := tx.RawTx.PreviousTxs[0]
+
+		// 在数据库中查询到创世交易
+		key := genesisHash[:]
+		txBytes, _ := txDatabase.Get(key)
+		genesisTx := TransactionDeSerialize(txBytes)
+
+		// 更新创世交易的权重和深度
+		genesisTx.Weight += tx.RawTx.Weight
+		genesisTx.Depth += 1
+
+		// 重新存入数据库
+		value := TransactionSerialize(genesisTx)
+		txDatabase.Put(key, value)
+	} else { // 前方为普通情况,即有若干笔普通交易(这种情况较为复杂,需要迭代更新前方所有的交易)
+		previousRawTxs := make([]*RawTransaction, 0)
+
+		for _, preTx := range tx.RawTx.PreviousTxs {
+			key := preTx[:]
+			txBytes, _ := txDatabase.Get(key)
+			txEntity := TransactionDeSerialize(txBytes)
+			previousRawTxs = append(previousRawTxs, txEntity)
+
+		}
+
+		for _, preTx := range previousRawTxs {
+			preTx.Weight += tx.RawTx.Weight // 被支持的交易权重 要增加
+			preTx.Depth += 1                // 被支持交易的深度+1
+
+			key := preTx.TxID[:]
+			value := TransactionSerialize(preTx)
+			txDatabase.Put(key, value)
+		}
+
+	}
 }
 
 // 当前交易进行Pow证明（根据难度值计算nonce）

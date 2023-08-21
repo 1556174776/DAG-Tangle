@@ -40,6 +40,8 @@ type Tangel struct {
 
 	curTipMutex       sync.RWMutex
 	candidateTipMutex sync.RWMutex
+
+	txCount int // 已经上链的交易总数(不包含创世交易,从1开始计数)
 }
 
 func NewTangle(λ int, h time.Duration, peer *p2p.Peer) *Tangel {
@@ -199,6 +201,8 @@ func (tg *Tangel) UpdateTipSet() {
 						tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, res)
 
 					tg.WorldStateMutex.Unlock()
+
+					tg.txCount++ // 上链交易数+1
 				}
 			}
 			tg.curTipMutex.Unlock()

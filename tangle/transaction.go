@@ -21,6 +21,12 @@ const (
 	defaultDiff uint64 = 3 // 默认的Pow难度值
 )
 
+const (
+	CommonWriteCode        = 0x00 // 表示交易类型,依据此来执行不同的合约函数
+	CommonReadCode         = 0x01
+	CommonWriteAndReadCode = 0x02
+)
+
 // TODO:会选出一样的交易，这个bug需要修改
 func RandomApproveStrategy(allTx []*RawTransaction) []*RawTransaction {
 	var count int
@@ -66,6 +72,7 @@ func RandomApproveStrategy(allTx []*RawTransaction) []*RawTransaction {
 
 type RawTransaction struct {
 	TxID        common.Hash
+	TxCode      int
 	Data        interface{}   // 交易内容
 	PreviousTxs []common.Hash // 前面的可供Approve的所有交易
 
@@ -110,8 +117,9 @@ func NewGenesisTx(sender common.NodeID) *Transaction {
 	return tx
 }
 
-func NewTransaction(data interface{}, tipTx []common.Hash, sender common.NodeID) *Transaction {
+func NewTransaction(data interface{}, tipTx []common.Hash, sender common.NodeID, txCode int) *Transaction {
 	rawTx := &RawTransaction{
+		TxCode:      txCode,
 		Data:        data,
 		PreviousTxs: tipTx,
 		Sender:      sender,

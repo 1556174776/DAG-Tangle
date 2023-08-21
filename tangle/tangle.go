@@ -194,12 +194,20 @@ func (tg *Tangel) UpdateTipSet() {
 
 					// 执行 candidateTx 交易
 					tg.WorldStateMutex.Lock()
-					candidateTx.CommonExecuteWrite(tg.WorldState, "test-key", "test-value")
 
-					res := candidateTx.CommonExecuteRead(tg.WorldState, "test-key")
-
-					loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 的 candidate(%x) 交易执行结果为: %s",
-						tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, res)
+					switch candidateTx.RawTx.TxCode {
+					case CommonWriteCode:
+						candidateTx.CommonExecuteWrite(tg.WorldState, "test-key", "test-value")
+					case CommonReadCode:
+						res := candidateTx.CommonExecuteRead(tg.WorldState, "test-key")
+						loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 的 candidate(%x) 交易执行结果为: %s",
+							tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, res)
+					case CommonWriteAndReadCode:
+						candidateTx.CommonExecuteWrite(tg.WorldState, "test-key", "test-value")
+						res := candidateTx.CommonExecuteRead(tg.WorldState, "test-key")
+						loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d) 的 candidate(%x) 交易执行结果为: %s",
+							tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, candidate.TxID, res)
+					}
 
 					tg.WorldStateMutex.Unlock()
 
@@ -235,7 +243,7 @@ func (tg *Tangel) PublishTransaction(data interface{}) {
 	// 	loglogrus.Log.Infof("[Tangle] 当前节点(%s:%d)即将发布的交易的Previous Tx(txCount:%d) (txID:%x)\n", tg.peer.LocalAddr.IP, tg.peer.LocalAddr.Port, len(tg.TipSet), tip)
 	// }
 
-	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID())
+	newTx := NewTransaction(data, tipSet, tg.peer.BackNodeID(), CommonWriteAndReadCode)
 
 	tg.DatabaseMutex.Lock()
 	newTx.SelectApproveTx(tg.Database)
